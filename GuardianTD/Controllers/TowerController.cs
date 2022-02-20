@@ -7,7 +7,7 @@ using System.Data.SqlClient;
 namespace GuardianTD.Controllers
 {
     /// <summary>
-    /// Tower Controller
+    /// Controller for Tower APIs
     /// </summary>
     [Route("api/[controller]")]
     [ApiController]

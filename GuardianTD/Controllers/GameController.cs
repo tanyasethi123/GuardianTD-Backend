@@ -9,7 +9,7 @@ using System.Data.SqlClient;
 namespace GuardianTD.Controllers
 {
     /// <summary>
-    /// Controller of Game APIs
+    /// Controller for Game APIs
     /// </summary>
     [Route("api/[controller]")]
     [ApiController]

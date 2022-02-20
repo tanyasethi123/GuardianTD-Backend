@@ -5,6 +5,9 @@ using System.Threading.Tasks;
 
 namespace GuardianTD.Models
 {
+    /// <summary>
+    /// Enemy Model
+    /// </summary>
     public class Enemy
     {
         /// <summary>

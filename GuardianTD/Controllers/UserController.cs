@@ -11,7 +11,7 @@ using System.Text.RegularExpressions;
 namespace GuardianTD.Controllers
 {
     /// <summary>
-    /// APIs for User
+    /// Controller for User APIs
     /// </summary>
     [Route("api/[controller]")]
     [ApiController]

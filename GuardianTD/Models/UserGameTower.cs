@@ -5,6 +5,9 @@ using System.Threading.Tasks;
 
 namespace GuardianTD.Models
 {
+    /// <summary>
+    /// User Game Tower Model
+    /// </summary>
     public class UserGameTower
     {
         /// <summary>
