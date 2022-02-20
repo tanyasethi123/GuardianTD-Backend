@@ -4,22 +4,34 @@ using System.Data;
 using System.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using GuardianTD.Models;
-using System.Net;
-using System.Net.Http;
+using Newtonsoft.Json.Linq;
+using System.Net.Mail;
+using System.Text.RegularExpressions;
 
 namespace GuardianTD.Controllers
 {
+    /// <summary>
+    /// Controller for User APIs
+    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
     public class UserController : ControllerBase
     {
         private readonly IConfiguration _configuration;
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="configuration"></param>
         public UserController(IConfiguration configuration)
         {
             _configuration = configuration;
         }
 
+        /// <summary>
+        /// Get All User Details
+        /// </summary>
+        /// <returns>Returns details of all Users</returns>
         [HttpGet]
         public JsonResult Get()
         {
@@ -30,18 +42,21 @@ namespace GuardianTD.Controllers
             using (SqlConnection myCon = new SqlConnection(sqlDataSource))
             {
                 myCon.Open();
-                using (SqlCommand myCommand = new SqlCommand(query, myCon))
-                {
-                    myReader = myCommand.ExecuteReader();
-                    table.Load(myReader);
-                    myReader.Close();
-                    myCon.Close();
-                }
+                using SqlCommand myCommand = new SqlCommand(query, myCon);
+                myReader = myCommand.ExecuteReader();
+                table.Load(myReader);
+                myReader.Close();
+                myCon.Close();
             }
 
             return new JsonResult(table);
         }
 
+        /// <summary>
+        /// Get User By Id
+        /// </summary>
+        /// <param name="id">Id of the User</param>
+        /// <returns>Returns the User Details By Id</returns>
         [HttpGet("{id}")]
         public JsonResult GetById(int id)
         {
@@ -52,50 +67,56 @@ namespace GuardianTD.Controllers
             using (SqlConnection myCon = new SqlConnection(sqlDataSource))
             {
                 myCon.Open();
-                using (SqlCommand myCommand = new SqlCommand(query, myCon))
-                {
-                    myCommand.Parameters.AddWithValue("@id",id);
-                    myReader = myCommand.ExecuteReader();
-                    table.Load(myReader);
-                    myReader.Close();
-                    myCon.Close();
-                }
+                using SqlCommand myCommand = new SqlCommand(query, myCon);
+                myCommand.Parameters.AddWithValue("@id", id);
+                myReader = myCommand.ExecuteReader();
+                table.Load(myReader);
+                myReader.Close();
+                myCon.Close();
             }
 
             return new JsonResult(table);
         }
 
+        /// <summary>
+        /// Add User
+        /// </summary>
+        /// <param name="user">User object with details</param>
+        /// <returns>Returns the id of the new User created</returns>
         [HttpPost]
         public JsonResult Post(User user)
         {
-            string query = @"
+                string query = @"
                             insert into dbo.users
-                            ([first_name],[last_name],[created_at],[email],[password],[active])
-                            values (@FirstName,@LastName,@CreatedAt,@Email,@Password,@Active)";
+                            ([first_name],[last_name],[created_at],[email],[password],[active]) output INSERTED.user_id
+                            values (@FirstName,@LastName,@CreatedAt,@Email,@Password,@Active);SELECT SCOPE_IDENTITY()";
             DataTable table = new DataTable();
             string sqlDataSource = _configuration.GetConnectionString("GuardianTDConn");
             SqlDataReader myReader;
+            JObject returnObj = new JObject();
             using (SqlConnection myCon = new SqlConnection(sqlDataSource))
             {
                 myCon.Open();
-                using (SqlCommand myCommand = new SqlCommand(query, myCon))
-                {
-                    myCommand.Parameters.AddWithValue("@FirstName", user.FirstName);
-                    myCommand.Parameters.AddWithValue("@LastName", user.LastName);
-                    myCommand.Parameters.AddWithValue("@CreatedAt", DateTime.UtcNow);
-                    myCommand.Parameters.AddWithValue("@Email", user.Email);
-                    myCommand.Parameters.AddWithValue("@Password", user.Password);
-                    myCommand.Parameters.AddWithValue("@Active", 1);
-                    myReader = myCommand.ExecuteReader();
-                    table.Load(myReader);
-                    myReader.Close();
-                    myCon.Close();
-                }
+                using SqlCommand myCommand = new SqlCommand(query, myCon);
+                myCommand.Parameters.AddWithValue("@FirstName", user.FirstName);
+                myCommand.Parameters.AddWithValue("@LastName", user.LastName);
+                myCommand.Parameters.AddWithValue("@CreatedAt", DateTime.UtcNow);
+                myCommand.Parameters.AddWithValue("@Email", user.Email);
+                myCommand.Parameters.AddWithValue("@Password", user.Password);
+                myCommand.Parameters.AddWithValue("@Active", 1);
+                int userId = (int)myCommand.ExecuteScalar();
+                myCon.Close();
+                returnObj.Add("userid", userId);
+                returnObj.Add("message", "User Added Successfully");
             }
-
-            return new JsonResult("User Added Successfully");
+            return new JsonResult(returnObj);
         }
 
+        /// <summary>
+        /// Update User Details
+        /// </summary>
+        /// <param name="user">User object with details</param>
+        /// <returns></returns>
         [HttpPut]
         public JsonResult Put(User user)
         {
@@ -108,23 +129,26 @@ namespace GuardianTD.Controllers
             using (SqlConnection myCon = new SqlConnection(sqlDataSource))
             {
                 myCon.Open();
-                using (SqlCommand myCommand = new SqlCommand(query, myCon))
-                {
-                    myCommand.Parameters.AddWithValue("@Id", user.Id);
-                    myCommand.Parameters.AddWithValue("@FirstName", user.FirstName);
-                    myCommand.Parameters.AddWithValue("@LastName", user.LastName);
-                    myCommand.Parameters.AddWithValue("@Email", user.Email);
-                    myCommand.Parameters.AddWithValue("@Password", user.Password);
-                    myReader = myCommand.ExecuteReader();
-                    table.Load(myReader);
-                    myReader.Close();
-                    myCon.Close();
-                }
+                using SqlCommand myCommand = new SqlCommand(query, myCon);
+                myCommand.Parameters.AddWithValue("@Id", user.Id);
+                myCommand.Parameters.AddWithValue("@FirstName", user.FirstName);
+                myCommand.Parameters.AddWithValue("@LastName", user.LastName);
+                myCommand.Parameters.AddWithValue("@Email", user.Email);
+                myCommand.Parameters.AddWithValue("@Password", user.Password);
+                myReader = myCommand.ExecuteReader();
+                table.Load(myReader);
+                myReader.Close();
+                myCon.Close();
             }
 
             return new JsonResult("User Details Updated Successfully");
         }
 
+        /// <summary>
+        /// Delete User By Id
+        /// </summary>
+        /// <param name="id">Id of the User</param>
+        /// <returns></returns>
         [HttpDelete("{id}")]
         public JsonResult Delete(int id)
         {
@@ -137,19 +161,23 @@ namespace GuardianTD.Controllers
             using (SqlConnection myCon = new SqlConnection(sqlDataSource))
             {
                 myCon.Open();
-                using (SqlCommand myCommand = new SqlCommand(query, myCon))
-                {
-                    myCommand.Parameters.AddWithValue("@Id",id);
-                    myReader = myCommand.ExecuteReader();
-                    table.Load(myReader);
-                    myReader.Close();
-                    myCon.Close();
-                }
+                using SqlCommand myCommand = new SqlCommand(query, myCon);
+                myCommand.Parameters.AddWithValue("@Id", id);
+                myReader = myCommand.ExecuteReader();
+                table.Load(myReader);
+                myReader.Close();
+                myCon.Close();
             }
 
             return new JsonResult("User Deleted Successfully");
         }
 
+        /// <summary>
+        /// Authenticate User
+        /// </summary>
+        /// <param name="emailId">Emailid of the user</param>
+        /// <param name="password">Password of the user</param>
+        /// <returns>Returns if the User Credentials are valid or invalid</returns>
         [HttpGet("Authenticate")]
         public ActionResult Authenticate(string emailId,string password)
         {
@@ -160,18 +188,16 @@ namespace GuardianTD.Controllers
             using (SqlConnection myCon = new SqlConnection(sqlDataSource))
             {
                 myCon.Open();
-                using (SqlCommand myCommand = new SqlCommand(query, myCon))
+                using SqlCommand myCommand = new SqlCommand(query, myCon);
+                myCommand.Parameters.AddWithValue("@Emailid", emailId);
+                myCommand.Parameters.AddWithValue("@Password", password);
+                myReader = myCommand.ExecuteReader();
+                if (myReader.HasRows)
                 {
-                    myCommand.Parameters.AddWithValue("@Emailid", emailId);
-                    myCommand.Parameters.AddWithValue("@Password", password);
-                    myReader = myCommand.ExecuteReader();
-                    if(myReader.HasRows)
-                    {
-                        hasResult = true;
-                    }
-                    myReader.Close();
-                    myCon.Close();
+                    hasResult = true;
                 }
+                myReader.Close();
+                myCon.Close();
             }
             if(hasResult)
                 return new OkResult();
