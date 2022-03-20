@@ -11,10 +11,6 @@ namespace GuardianTD.Models
     public class UserCoins
     {
         /// <summary>
-        /// Id of the Coins of User
-        /// </summary>
-        public int UserCoinsId { get; set; }
-        /// <summary>
         /// Id of the User
         /// </summary>
         public int UserId { get; set; }

@@ -83,44 +83,45 @@ namespace GuardianTD.Controllers
         /// <param name="userGameTower">User Game Tower Object with details</param>
         /// <returns></returns>
         [HttpPost]
-        public JsonResult Post(UserGameTower userGameTower)
+        public JsonResult Post(UserGameTower[] userGameTowerList)
         {
             string query = @"
                             insert into dbo.user_game_tower
-                            ([user_game_id],[tower_id],[tower_position_x],[tower_position_y],[tower_position_z])
-                            values (@UserGameId,@TowerId,@TowerPositionX,@TowerPositionY,@TowerPositionZ)";
-            DataTable table = new DataTable();
-            string sqlDataSource = _configuration.GetConnectionString("GuardianTDConn");
-            SqlDataReader myReader;
-            using (SqlConnection myCon = new SqlConnection(sqlDataSource))
+                            ([user_game_id],[tower_id],[vector])
+                            values (@UserGameId,@TowerId,@Vector)";
+            foreach (var userGameTower in userGameTowerList)
             {
-                myCon.Open();
-                using SqlCommand myCommand = new SqlCommand(query, myCon);
-                myCommand.Parameters.AddWithValue("@UserGameId", userGameTower.UserGameId);
-                myCommand.Parameters.AddWithValue("@TowerId", userGameTower.TowerId);
-                myCommand.Parameters.AddWithValue("@TowerPositionX", userGameTower.TowerPositionX);
-                myCommand.Parameters.AddWithValue("@TowerPositionY", userGameTower.TowerPositionY);
-                myCommand.Parameters.AddWithValue("@TowerPositionZ", userGameTower.TowerPositionZ);
-                myReader = myCommand.ExecuteReader();
-                table.Load(myReader);
-                myReader.Close();
-                myCon.Close();
+                
+                DataTable table = new DataTable();
+                string sqlDataSource = _configuration.GetConnectionString("GuardianTDConn");
+                SqlDataReader myReader;
+                using (SqlConnection myCon = new SqlConnection(sqlDataSource))
+                {
+                    myCon.Open();
+                    using SqlCommand myCommand = new SqlCommand(query, myCon);
+                    myCommand.Parameters.AddWithValue("@UserGameId", userGameTower.UserGameId);
+                    myCommand.Parameters.AddWithValue("@TowerId", userGameTower.TowerId);
+                    myCommand.Parameters.AddWithValue("@Vector", userGameTower.Vector);
+                    myReader = myCommand.ExecuteReader();
+                    table.Load(myReader);
+                    myReader.Close();
+                    myCon.Close();
+                }
             }
-
-            return new JsonResult("User Game Tower Added Successfully");
+            return new JsonResult("User Game Tower(s) Added Successfully");
         }
 
         /// <summary>
-        /// Delete User Game Tower By Id
+        /// Delete User Game Tower By User Game Id
         /// </summary>
         /// <param name="id">Id of the User Game Tower</param>
         /// <returns></returns>
-        [HttpDelete("{id}")]
+        [HttpDelete("UserGame/{id}")]
         public JsonResult Delete(int id)
         {
             string query = @"
                             delete from dbo.user_game_tower
-                             where user_game_tower_id=@Id";
+                             where user_game_id=@Id";
             DataTable table = new DataTable();
             string sqlDataSource = _configuration.GetConnectionString("GuardianTDConn");
             SqlDataReader myReader;
@@ -135,7 +136,7 @@ namespace GuardianTD.Controllers
                 myCon.Close();
             }
 
-            return new JsonResult("User Game Tower Deleted Successfully");
+            return new JsonResult("User Game Tower(s) Deleted Successfully");
         }
     }
 }
