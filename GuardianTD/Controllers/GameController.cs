@@ -141,8 +141,8 @@ namespace GuardianTD.Controllers
         /// </summary>
         /// <param name="userGame">Game object with details to be updated</param>
         /// <returns></returns>
-        [HttpPut]
-        public JsonResult Put(UserGame userGame)
+        [HttpPatch]
+        public JsonResult Patch(UserGame userGame)
         {
             List<string> setConditions = new List<string>();
             if (userGame.UserScore != null)

@@ -25,15 +25,7 @@ namespace GuardianTD.Models
         /// <summary>
         /// Position X of Tower
         /// </summary>
-        public int TowerPositionX { get; set; }
-        /// <summary>
-        /// Position Y of Tower
-        /// </summary>
-        public int TowerPositionY { get; set; }
-        /// <summary>
-        /// Position Z of Tower
-        /// </summary>
-        public int TowerPositionZ { get; set; }
+        public string Vector { get; set; }
         /// <summary>
         /// Name of the Tower
         /// </summary>

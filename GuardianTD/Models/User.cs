@@ -17,11 +17,7 @@ namespace GuardianTD.Models
         /// <summary>
         /// First Name of the User
         /// </summary>
-        public string FirstName { get; set; }
-        /// <summary>
-        /// Last Name of the User
-        /// </summary>
-        public string LastName { get; set; }
+        public string UserName { get; set; }
         /// <summary>
         /// Email id of the User
         /// </summary>

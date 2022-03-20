@@ -31,7 +31,7 @@ namespace GuardianTD.Controllers
         [HttpGet]
         public JsonResult Get()
         {
-            string query = @"select ut.*,u.first_name,u.last_name,t.* from dbo.user_towers ut
+            string query = @"select ut.*,u.user_name,t.* from dbo.user_towers ut
                 left join users u on ut.user_id=u.user_id
                 left join towers t on ut.tower_id=t.tower_id";
             DataTable table = new DataTable();
@@ -58,7 +58,7 @@ namespace GuardianTD.Controllers
         [HttpGet("User/{id}")]
         public JsonResult GetByUserId(int id)
         {
-            string query = @"select ut.*,u.first_name,u.last_name,t.* from dbo.user_towers ut
+            string query = @"select ut.*,u.user_name,t.* from dbo.user_towers ut
                 left join users u on ut.user_id=u.user_id
                 left join towers t on ut.tower_id=t.tower_id where ut.user_id=@UserId";
             DataTable table = new DataTable();

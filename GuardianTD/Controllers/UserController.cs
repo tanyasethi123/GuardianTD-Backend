@@ -88,8 +88,8 @@ namespace GuardianTD.Controllers
         {
                 string query = @"
                             insert into dbo.users
-                            ([first_name],[last_name],[created_at],[email],[password],[active]) output INSERTED.user_id
-                            values (@FirstName,@LastName,@CreatedAt,@Email,@Password,@Active);SELECT SCOPE_IDENTITY()";
+                            ([user_name],[created_at],[email],[password],[active]) output INSERTED.user_id
+                            values (@UserName,@CreatedAt,@Email,@Password,@Active);SELECT SCOPE_IDENTITY()";
             DataTable table = new DataTable();
             string sqlDataSource = _configuration.GetConnectionString("GuardianTDConn");
             SqlDataReader myReader;
@@ -98,8 +98,7 @@ namespace GuardianTD.Controllers
             {
                 myCon.Open();
                 using SqlCommand myCommand = new SqlCommand(query, myCon);
-                myCommand.Parameters.AddWithValue("@FirstName", user.FirstName);
-                myCommand.Parameters.AddWithValue("@LastName", user.LastName);
+                myCommand.Parameters.AddWithValue("@UserName", user.UserName);
                 myCommand.Parameters.AddWithValue("@CreatedAt", DateTime.UtcNow);
                 myCommand.Parameters.AddWithValue("@Email", user.Email);
                 myCommand.Parameters.AddWithValue("@Password", user.Password);
@@ -117,12 +116,12 @@ namespace GuardianTD.Controllers
         /// </summary>
         /// <param name="user">User object with details</param>
         /// <returns></returns>
-        [HttpPut]
-        public JsonResult Put(User user)
+        [HttpPatch]
+        public JsonResult Patch(User user)
         {
             string query = @"
                             update dbo.users
-                            set first_name= @FirstName,last_name=@LastName,email=@Email,password=@Password where user_id=@Id";
+                            set user_name= @UserName,email=@Email,password=@Password where user_id=@Id";
             DataTable table = new DataTable();
             string sqlDataSource = _configuration.GetConnectionString("GuardianTDConn");
             SqlDataReader myReader;
@@ -131,8 +130,7 @@ namespace GuardianTD.Controllers
                 myCon.Open();
                 using SqlCommand myCommand = new SqlCommand(query, myCon);
                 myCommand.Parameters.AddWithValue("@Id", user.Id);
-                myCommand.Parameters.AddWithValue("@FirstName", user.FirstName);
-                myCommand.Parameters.AddWithValue("@LastName", user.LastName);
+                myCommand.Parameters.AddWithValue("@UserName", user.UserName);
                 myCommand.Parameters.AddWithValue("@Email", user.Email);
                 myCommand.Parameters.AddWithValue("@Password", user.Password);
                 myReader = myCommand.ExecuteReader();
