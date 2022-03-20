@@ -5,6 +5,9 @@ using System.Threading.Tasks;
 
 namespace GuardianTD.Models
 {
+    /// <summary>
+    /// Achievement Model
+    /// </summary>
     public class Achievement
     {
         /// <summary>
