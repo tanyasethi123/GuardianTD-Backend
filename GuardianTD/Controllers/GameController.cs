@@ -112,8 +112,8 @@ namespace GuardianTD.Controllers
         {
             string query = @"
                             insert into dbo.user_game
-                            ([user_id],[game_type],[user_score],[created_at],[updated_at],[enemy_id])
-                            values (@UserId,@GameType,@UserScore,@CreatedAt,@UpdatedAt,@EnemyId)";
+                            ([user_id],[game_type],[user_score],[created_at],[updated_at],[enemy_id],[user_health])
+                            values (@UserId,@GameType,@UserScore,@CreatedAt,@UpdatedAt,@EnemyId,@UserHealth)";
             DataTable table = new DataTable();
             string sqlDataSource = _configuration.GetConnectionString("GuardianTDConn");
             SqlDataReader myReader;
@@ -127,6 +127,7 @@ namespace GuardianTD.Controllers
                 myCommand.Parameters.AddWithValue("@CreatedAt", DateTime.UtcNow);
                 myCommand.Parameters.AddWithValue("@UpdatedAt", DateTime.UtcNow);
                 myCommand.Parameters.AddWithValue("@EnemyId", userGame.EnemyId);
+                myCommand.Parameters.AddWithValue("@UserHealth", userGame.UserHealth);
                 myReader = myCommand.ExecuteReader();
                 table.Load(myReader);
                 myReader.Close();
@@ -147,6 +148,8 @@ namespace GuardianTD.Controllers
             List<string> setConditions = new List<string>();
             if (userGame.UserScore != null)
                 setConditions.Add(@"user_score = @UserScore ");
+            if (userGame.UserHealth != null)
+                setConditions.Add(@"user_health = @UserHealth ");
             if (userGame.EnemyId != null)
                 setConditions.Add(@"enemy_id = @EnemyId ");
 
@@ -164,6 +167,8 @@ namespace GuardianTD.Controllers
                 myCommand.Parameters.AddWithValue("@Id", userGame.UserGameId);
                 if (userGame.UserScore != null)
                     myCommand.Parameters.AddWithValue("@UserScore", userGame.UserScore);
+                if (userGame.UserHealth != null)
+                    myCommand.Parameters.AddWithValue("@UserHealth", userGame.UserHealth);
                 if (userGame.EnemyId != null)
                     myCommand.Parameters.AddWithValue("@EnemyId", userGame.EnemyId);
                 myReader = myCommand.ExecuteReader();

@@ -27,6 +27,10 @@ namespace GuardianTD.Models
         /// </summary>
         public int? UserScore { get; set; }
         /// <summary>
+        /// Health of the User in Game
+        /// </summary>
+        public int? UserHealth { get; set; }
+        /// <summary>
         /// Id of the Enemy
         /// </summary>
         public int? EnemyId { get; set; }
